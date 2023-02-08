@@ -1,5 +1,5 @@
 {
-  "name": "@viewberapp/chat",
+  "name": "@viewberapp/notifications",
   "version": "0.0.1",
   "main": "dist/index.js",
   "scripts": {
