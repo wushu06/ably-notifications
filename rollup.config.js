@@ -4,9 +4,6 @@
  */
 
 
-// The Sass plugin will help us transpile our Sass code down to normal CSS and inject it into our final build (users won’t have to import the CSS separately).
-import sass from 'rollup-plugin-sass'
-
 // The TypeScript plugin will help us transpile our TypeScript code down to ES5 JavaScript.
 import typescript from 'rollup-plugin-typescript2'
 
@@ -30,7 +27,6 @@ export default {
 
     // tells Rollup which plugins we want to use along with the configuration for each one
     plugins: [
-      sass({ insert: true }),
       typescript({ objectHashIgnoreUnknownHack: true })
     ],
 

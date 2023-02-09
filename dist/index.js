@@ -1,16 +1,3 @@
-
-
-function ___$insertStyle(css) {
-    if (!css || typeof window === 'undefined') {
-        return;
-    }
-    const style = document.createElement('style');
-    style.setAttribute('type', 'text/css');
-    style.innerHTML = css;
-    document.head.appendChild(style);
-    return css;
-}
-
 Object.defineProperty(exports, '__esModule', { value: true });
 
 var React = require('react');
@@ -95,129 +82,113 @@ function __generator(thisArg, body) {
 }
 
 var initialized = false;
-function createTokenRequest(token) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            if (initialized) {
-                return [2 /*return*/];
-            }
-            return [2 /*return*/, axios__default["default"].post("".concat(process.env.REACT_APP_API_BASE_URL, "/api/v1/notifications/ably/token"), null, {
-                    headers: { 'Authorization': "Bearer ".concat(token) }
-                })
-                    .then(function (response) {
-                    return response.data;
-                })["catch"](function (err) {
-                    return err;
+var createTokenRequest = function (props) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        if (initialized) {
+            return [2 /*return*/];
+        }
+        return [2 /*return*/, axios__default["default"].post(props.url, null, { headers: { 'Authorization': "Bearer ".concat(props.token) } })
+                .then(function (response) {
+                return response.data;
+            })["catch"](function (err) {
+                return err;
+            })];
+    });
+}); };
+var settingUpAbly = function (props) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        return [2 /*return*/, new Ably__namespace.Realtime({
+                authCallback: function (tokenParams, callback) { return __awaiter(void 0, void 0, void 0, function () {
+                    var tokenRequest, error_1;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0:
+                                _a.trys.push([0, 2, , 3]);
+                                return [4 /*yield*/, createTokenRequest(props)];
+                            case 1:
+                                tokenRequest = _a.sent();
+                                callback(null, tokenRequest);
+                                initialized = true;
+                                return [3 /*break*/, 3];
+                            case 2:
+                                error_1 = _a.sent();
+                                callback(error_1, null);
+                                return [3 /*break*/, 3];
+                            case 3: return [2 /*return*/];
+                        }
+                    });
+                }); }
+            })];
+    });
+}); };
+var connectToAbly = function (ably, user) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, ably.connection.once('connected')];
+            case 1:
+                _a.sent();
+                return [2 /*return*/, ably.channels.get("private:App.User.".concat(user.id))];
+        }
+    });
+}); };
+var listenToChannel = function (channel, setMessage) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, channel.subscribe('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', function (message) {
+                    setMessage(message);
                 })];
-        });
+            case 1: return [2 /*return*/, _a.sent()];
+        }
     });
-}
-function settingUpAbly(token) {
-    return __awaiter(this, void 0, void 0, function () {
-        var _this = this;
-        return __generator(this, function (_a) {
-            return [2 /*return*/, new Ably__namespace.Realtime({
-                    authCallback: function (tokenParams, callback) { return __awaiter(_this, void 0, void 0, function () {
-                        var tokenRequest, error_1;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    _a.trys.push([0, 2, , 3]);
-                                    return [4 /*yield*/, createTokenRequest(token)]; // Make a network request to your server
-                                case 1:
-                                    tokenRequest = _a.sent() // Make a network request to your server
-                                    ;
-                                    callback(null, tokenRequest);
-                                    initialized = true;
-                                    return [3 /*break*/, 3];
-                                case 2:
-                                    error_1 = _a.sent();
-                                    callback(error_1, null);
-                                    return [3 /*break*/, 3];
-                                case 3: return [2 /*return*/];
-                            }
-                        });
-                    }); }
-                })];
-        });
+}); };
+var handleRealTimeNotifications = function (props, setMessage) { return __awaiter(void 0, void 0, void 0, function () {
+    var ably, channel, message, error_2;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                _a.trys.push([0, 4, , 5]);
+                return [4 /*yield*/, settingUpAbly(props)];
+            case 1:
+                ably = _a.sent();
+                return [4 /*yield*/, connectToAbly(ably, props.user)];
+            case 2:
+                channel = _a.sent();
+                return [4 /*yield*/, listenToChannel(channel, setMessage)];
+            case 3:
+                message = _a.sent();
+                return [2 /*return*/, {
+                        ably: ably,
+                        message: message,
+                        error: null
+                    }];
+            case 4:
+                error_2 = _a.sent();
+                return [2 /*return*/, { ably: null, message: null, error: error_2 }];
+            case 5: return [2 /*return*/];
+        }
     });
-}
-function connectToAbly(ably, user) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, ably.connection.once('connected')];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/, ably.channels.get("private:App.User.".concat(user.id))];
-            }
-        });
-    });
-}
-function listenToChannel(channel, callback) {
-    return __awaiter(this, void 0, void 0, function () {
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, channel.subscribe('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', function (message) {
-                        callback(message);
-                    })];
-                case 1:
-                    _a.sent();
-                    return [2 /*return*/];
-            }
-        });
-    });
-}
-function handleRealTimeNotifications(user, token, callback) {
-    return __awaiter(this, void 0, void 0, function () {
-        var ably, channel, message, error_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    _a.trys.push([0, 4, , 5]);
-                    return [4 /*yield*/, settingUpAbly(token)];
-                case 1:
-                    ably = _a.sent();
-                    return [4 /*yield*/, connectToAbly(ably, user)];
-                case 2:
-                    channel = _a.sent();
-                    return [4 /*yield*/, listenToChannel(channel, callback)];
-                case 3:
-                    message = _a.sent();
-                    return [2 /*return*/, {
-                            ably: ably,
-                            message: message,
-                            error: null
-                        }];
-                case 4:
-                    error_2 = _a.sent();
-                    return [2 /*return*/, { ably: null, message: null, error: error_2 }];
-                case 5: return [2 /*return*/];
-            }
-        });
-    });
-}
+}); };
 
 var useState = React__namespace.useState, useEffect = React__namespace.useEffect;
-function useRealTimeNotification(user, token, callback) {
+var useRealTimeNotification = function (props) {
     var _a = useState({}), value = _a[0], setValue = _a[1];
+    var _b = useState({}), message = _b[0], setMessage = _b[1];
     useEffect(function () {
-        if (!user) {
+        if (!props.user) {
             return;
         }
         var ably = null;
-        var a = handleRealTimeNotifications(user, token, callback)
+        handleRealTimeNotifications(props, setMessage)
             .then(function (data) {
             setValue(data);
             ably = data.ably;
         })["catch"](function (e) { return setValue(e); });
-        console.log(a);
         return function () {
             ably && ably.close();
         };
-    }, [user]);
-    return value;
-}
+    }, [props.user]);
+    return [message, value];
+};
 
 exports.useRealTimeNotification = useRealTimeNotification;
 //# sourceMappingURL=index.js.map
