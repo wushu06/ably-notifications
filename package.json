@@ -7,7 +7,9 @@
     "build": "rollup -c",
     "start": "rollup -c -w"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://bitbucket.org/ezadr/viewberjs.git"
@@ -19,18 +21,17 @@
   },
   "homepage": "https://bitbucket.org/ezadr/viewberjs#readme",
   "devDependencies": {
-    "@types/react": "^17.0.3",
-    "@types/react-dom": "^17.0.2",
+    "@types/react": "^16.14.0",
     "babel-core": "^6.26.3",
     "babel-runtime": "^6.26.0",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
     "rollup": "^2.41.2",
     "rollup-plugin-typescript2": "^0.30.0",
     "typescript": "^4.2.3"
   },
   "peerDependencies": {
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0"
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-router-dom": "^6.8.1",
+    "react-toastify": "^5.5.0"
   }
 }

@@ -3,6 +3,8 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var Ably = require('ably');
 var axios = require('axios');
+var reactToastify = require('react-toastify');
+var reactRouterDom = require('react-router-dom');
 
 function _interopDefaultLegacy (e) { return e && typeof e === 'object' && 'default' in e ? e : { 'default': e }; }
 
@@ -24,6 +26,7 @@ function _interopNamespace(e) {
     return Object.freeze(n);
 }
 
+var React__default = /*#__PURE__*/_interopDefaultLegacy(React);
 var React__namespace = /*#__PURE__*/_interopNamespace(React);
 var Ably__namespace = /*#__PURE__*/_interopNamespace(Ably);
 var axios__default = /*#__PURE__*/_interopDefaultLegacy(axios);
@@ -131,10 +134,10 @@ var connectToAbly = function (ably, user) { return __awaiter(void 0, void 0, voi
         }
     });
 }); };
-var listenToChannel = function (channel, setMessage) { return __awaiter(void 0, void 0, void 0, function () {
+var listenToChannel = function (channel, broadcastAs, setMessage) { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, channel.subscribe('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', function (message) {
+            case 0: return [4 /*yield*/, channel.subscribe(broadcastAs ? broadcastAs : 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', function (message) {
                     setMessage(message);
                 })];
             case 1: return [2 /*return*/, _a.sent()];
@@ -153,7 +156,7 @@ var handleRealTimeNotifications = function (props, setMessage) { return __awaite
                 return [4 /*yield*/, connectToAbly(ably, props.user)];
             case 2:
                 channel = _a.sent();
-                return [4 /*yield*/, listenToChannel(channel, setMessage)];
+                return [4 /*yield*/, listenToChannel(channel, props.broadcastAs, setMessage)];
             case 3:
                 message = _a.sent();
                 return [2 /*return*/, {
@@ -168,6 +171,25 @@ var handleRealTimeNotifications = function (props, setMessage) { return __awaite
         }
     });
 }); };
+
+var toastOptions = {
+    position: "top-right",
+    autoClose: false,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light"
+};
+var handleNotifications = function (message) {
+    var _a, _b;
+    if (!((_a = message === null || message === void 0 ? void 0 : message.data) === null || _a === void 0 ? void 0 : _a.message) || !((_b = message === null || message === void 0 ? void 0 : message.data) === null || _b === void 0 ? void 0 : _b.link)) {
+        return;
+    }
+    reactToastify.toast((React__default["default"].createElement("div", null,
+        React__default["default"].createElement(reactRouterDom.Link, { to: message.data.link }, message.data.message))), toastOptions);
+};
 
 var useState = React__namespace.useState, useEffect = React__namespace.useEffect;
 var useRealTimeNotification = function (props) {
@@ -187,6 +209,9 @@ var useRealTimeNotification = function (props) {
             ably && ably.close();
         };
     }, [props.user]);
+    useEffect(function () {
+        handleNotifications(message);
+    }, [message]);
     return [message, value];
 };
 

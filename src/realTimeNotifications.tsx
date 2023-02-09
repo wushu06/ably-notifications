@@ -46,8 +46,10 @@ const connectToAbly = async (ably: Ably.Realtime, user: {id: number}): Promise<a
     return ably.channels.get(`private:App.User.${user.id}`);
 }
 
-const listenToChannel = async (channel, setMessage: SetState): Promise<SetState> => {
-    return await channel.subscribe('Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (message: object) => {
+const listenToChannel = async (channel, broadcastAs, setMessage: SetState): Promise<SetState> => {
+    return await channel.subscribe(
+        broadcastAs ? broadcastAs : 'Illuminate\\Notifications\\Events\\BroadcastNotificationCreated',
+        (message: object) => {
         setMessage(message);
     });
 }
@@ -56,7 +58,7 @@ export const handleRealTimeNotifications = async (props: Props, setMessage): Pro
     try {
         const ably = await settingUpAbly(props);
         const channel = await connectToAbly(ably, props.user);
-        const message = await listenToChannel(channel, setMessage);
+        const message = await listenToChannel(channel, props.broadcastAs, setMessage,);
         return {
             ably,
             message,
